@@ -488,7 +488,9 @@ print("Correcting masses")
 
 rs=[]
 c_exp=exp.__copy__()
-for ix,spec in enumerate(exp):
+specs=c_exp.getSpectra()
+
+for ix,spec in enumerate(c_exp):
     
     #get data
     ms=spec.getMSLevel()
@@ -499,7 +501,8 @@ for ix,spec in enumerate(exp):
     #fit spectrum
     f=ecal.loc[scan]
     c=correct_mass(m,f)
-    c_exp[ix].set_peaks((c,peaks[1]))
+    
+    specs[ix].set_peaks([c,peaks[1]])
     
     #fit precursor
     if ms==2:
@@ -508,8 +511,9 @@ for ix,spec in enumerate(exp):
             r=correct_mass(prec.getMZ(),f)
             precs[ip].setMZ(r)
             rs.append([scan,r])
-        c_exp[ix].setPrecursors(precs)
-
+        specs[ix].setPrecursors(precs)
+        
+c_exp.setSpectra(specs)
 pyopenms.MzMLFile().store(mzML_file.replace(".mzML","_calibrated.mzML"), c_exp)
 
 #%% Compare precursors
